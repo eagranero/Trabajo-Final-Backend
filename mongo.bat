@@ -1,1 +1,1 @@
-mongod --dbpath "C:\Users\Eduardo\Documents\Documentacion personal\Cursos\CoderHouse\Back End\Trabajo Final -BackEnd\dbmongo"
+mongod --dbpath ".\dbmongo"
