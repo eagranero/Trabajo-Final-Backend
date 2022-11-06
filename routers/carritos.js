@@ -7,8 +7,8 @@ import {DaosCarritoMongo, DaosCarritoFirebase} from "../daos/mainDaos.js"
 
 //ACA SE PUEDE SELECCIONAR QUE BASE DE DATOS USAR PARA CARRITOS (una o la otra)
 
-//export const carritos = new DaosCarritoMongo("carritos",SchemaCarrito)
-export const carritos = new DaosCarritoFirebase("carritos")
+export const carritos = new DaosCarritoMongo("carritos",SchemaCarrito)
+//export const carritos = new DaosCarritoFirebase("carritos")
 
 //-----------------------------------------------------------------------
 

@@ -6,8 +6,8 @@ import {DaosProductoMongo, DaosProductoFirebase} from "../daos/mainDaos.js"
 
 //ACA SE PUEDE SELECCIONAR QUE BASE DE DATOS USAR PARA PRODUCTOS (una o la otra)
 
-export const stock = new DaosProductoMongo("productos",SchemaProducto)
-//export const stock = new DaosProductoFirebase("productos")
+//export const stock = new DaosProductoMongo("productos",SchemaProducto)
+export const stock = new DaosProductoFirebase("productos")
 
 //------------------------------------------------------------------------------
 
