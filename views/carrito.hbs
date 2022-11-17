@@ -1,0 +1,13 @@
+<div style="display:flex; flex-direction:column" >
+    {{> encabezado}}
+    {{> encabezado_login}}
+    {{> nav}}
+    <div>
+        {{> item}}
+        <form style="display:flex; justify-content:center" method="post" action="carrito/comprar">
+            <button style="width:50%; font-size:2rem  ;margin-block: 10px;" name="boton" type="submit" placeholder="Comprar">Comprar</button>
+        </form>
+        <h1 id="h1-compresion" style="text-align:center"></h1>
+        {{> chat}}
+    </div>
+</div>

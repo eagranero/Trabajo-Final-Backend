@@ -1,52 +1,183 @@
-
 import express from "express";
-import cors from "cors"
-import { createServer } from "http";
+import { createServer, get } from "http";
 import { Server } from "socket.io";
-import {routerCarrito, carritos} from "./routers/carritos.js"
-import {administrador, routerProductos, stock} from "./routers/productos.js"
+import {engine} from "express-handlebars"
+import { routerProductos,listadoProductos } from "./routers/productos.js";
+import {socket} from "./socket.js"
+import session from "express-session"
+import MongoStore from "connect-mongo";
+import { routerLogin } from "./routers/login.js";
+import passport from "passport";
+import dotenv from 'dotenv'
+import Yargs from "yargs";
+import { randoms } from "./routers/randoms.js";
+import cluster from "cluster";
+import numCPUs from "os"
+import compression from "compression"
+import logger from "./utils/logger.js"
+import { routerInicio } from "./routers/inicio.js";
+import { routerCarrito } from "./routers/carrito.js";
+import enviarMail, { nuevaCompraMail, nuevoUsuarioMail } from "./utils/mail.js";
+import { smsCompraExitosa } from "./utils/sms.js";
+import { wspCompraExitosa } from "./utils/wsp.js";
 
 
-//Esta funcion es para cear algunos productos y carrito para probar
-const funcionSincronica = (async ()=>{
-  await stock.deleteAll();
-  await stock.save({nombre:"Producto 1",descrcipcion:"Descripcion 1",codigo:"codigo 1",foto:"foto 1",precio:100,stock:10});
-  await stock.save({nombre:"Producto 2",descrcipcion:"Descripcion 2",codigo:"codigo 2",foto:"foto 2",precio:100,stock:10});
-  await stock.save({nombre:"Producto 5",descrcipcion:"Descripcion 5",codigo:"codigo 5",foto:"foto 5",precio:100,stock:10});
-  await stock.save({nombre:"Producto 3",descrcipcion:"Descripcion 3",codigo:"codigo 3",foto:"foto 3",precio:100,stock:10});
-  await stock.save({nombre:"Producto 4",descrcipcion:"Descripcion 4",codigo:"codigo 4",foto:"foto 4",precio:100,stock:10});
-  await carritos.deleteAll();
-  await carritos.save({productos:[]})
+
+//logger.info("algo")
+
+dotenv.config()
+
+//Cargo 3 productos de prueba
+/*const asincronica=(async()=>{
+    listadoProductos.crearDBProductos();
+    await listadoProductos.deleteAll()
+    //await listadoChat.deleteAll()
+    await listadoProductos.save_Knex({nombre:"Escuadra", precio:123.45, thumbnail:"../img/escuadra.jpg"})
+    await listadoProductos.save_Knex({nombre:"Calculadora", precio:123.45, thumbnail:"../img/calculadora.jpg"});
+    await listadoProductos.save_Knex({nombre:"Cuaderno", precio:123.45, thumbnail:"../img/cuaderno.jpg"});
+})()*/
+
+const asincronica=(async()=>{
+  await listadoProductos.deleteAll()
+  await listadoProductos.save({nombre:"Escuadra", precio:123.45, thumbnail:"../img/escuadra.jpg"})
+  await listadoProductos.save({nombre:"Calculadora", precio:123.45, thumbnail:"../img/calculadora.jpg"})
+  await listadoProductos.save({nombre:"Cuaderno", precio:123.45, thumbnail:"../img/cuaderno.jpg"})
 })()
 
 
 
-//Inicio Servidor Express---------------------------------------------------------------------
+//Inicio Servidor Express
 const app = express();
+app.use(compression())
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: process.env.DATABASE_CONNECTION_STRING,
+      mongoOptions: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
+    }),
+
+    secret: process.env.SECRET_MONGO,
+    cookie: {maxAge: 100000},
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(express.static('public'));
+app.set('view engine', 'hbs');
+app.set('views', './views');
+app.engine(
+    'hbs',
+    engine({
+        extname: '.hbs',
+        defaultLayout: 'index.hbs',
+        layoutsDir: './views/layouts',
+        partialsDir: './views/partials',
+    })
+);
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.json())
+app.use(express.urlencoded({extended:true}));
+  
+  
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 const PORT = process.env.PORT || 8080
+const args = Yargs(process.argv.slice(2)).default({port:8000,modo:"fork"}).argv
 
-httpServer.listen(PORT,()=>{
-    console.log("Servidor Encendido")
+
+if (cluster.isPrimary && args.modo=="cluster") {
+  console.log(`Master ${process.pid} is running`);
+  for (let i = 0; i < numCPUs.cpus().length; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker, code, signal) => {
+    cluster.fork();
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {
+  httpServer.listen(PORT,()=>{
+    console.log("Servidor Encendido en puerto "+ PORT)
+  })
+  httpServer.on("error",(error)=>{console.log("Error en servidor")})
+  console.log(`Worker ${process.pid} started`);
+}
+
+
+app.use(function(req,res,next){
+  req.session._garbage = Date();
+  req.session.touch();
+  next()
 })
 
-httpServer.on("error",(error)=>{console.log("Error en servidor")})
+app.use(function (req, res, next) {
+  logger.info(req.method + " " + req.url);
+  next();
+});
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}));
-app.use(express.static('public'));
+app.use('/api/inicio',routerInicio)
 app.use('/api/productos',routerProductos);
-app.use('/api/carrito',routerCarrito);
-app.use(cors());
+app.use('/api/carrito',routerCarrito)
+app.use('/api/randoms',randoms);
+app.use('/login',routerLogin);
 
-//Ruta para cambiar el estado de la variable administrador
-app.get('/administrador',(req, res) => {
-  if (administrador) {
-    administrador=false; 
-    res.json({mensaje:"Vista Administrador desactivada"})}
-  else {
-    admin=true; 
-    res.json({mensaje:"Vista Administrador activada"})}
+app.get('/', async (req, res) => {
+  if (req.session.user) res.redirect("/login")
+  else res.redirect("/login")
+});
+
+
+app.get("/info",(req,res)=>{
+  const informacion = {
+    Argumentos: args,
+    Plataforma: process.platform,
+    ID: process.pid,
+    Version: process.version,
+    Memoria:process.memoryUsage(),
+    Path:process.execPath,
+    Carpeta: process.cwd()
   }
-)
+  console.log(informacion)//esta es la linea que agrego
+  res.json(informacion);
+  //res.send("asdasd".repeat(1000))
+})
+
+
+const items =[{nombre:"Escuadra", precio:123.45, thumbnail:'../img/escuadra.jpg'},{nombre:"Calculadora", precio:123.45, thumbnail:"../img/calculadora.jpg"}]
+
+app.get ("/items",(req,res)=>{
+  res.render("item",{items})
+})
+
+app.get('/enviarsms',(req,res)=>{
+  //smsCompraExitosa('2644560346')
+  wspCompraExitosa('2644560346')
+  res.json("mail enviado")
+})
+
+
+
+app.get('*', (req, res)=>{
+  logger.warn(req.method + " " + req.url);
+  
+
+  res.status(404).send('sitio no encotrado');
+});
+
+socket(io)
+
+
+
+
+
+
+
+
+
+
+

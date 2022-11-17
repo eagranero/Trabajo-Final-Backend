@@ -1,5 +1,7 @@
-import Contenedor_Mongo from "./contenedores/Contenedor_Mongo.js";
-import Contenedor_Firebase from "./contenedores/Contenedor_Firebase.js"
+import Contenedor_Mongo, { connectMG } from "./mongo/Contenedor_Mongo.js";
+
+
+connectMG("carritos");
 
 export class DaosCarritoMongo extends Contenedor_Mongo{
     constructor(nombre,schema){
@@ -23,6 +25,10 @@ export class DaosCarritoMongo extends Contenedor_Mongo{
         }
     }
 
+    async borrarElementosCarrito(idCarrito){
+        await this.collectionElement.findByIdAndUpdate(idCarrito,{"productos":[]})
+    }
+
     async quitarDelCarrito(idCarrito,idProducto){
         try{
             let carrito=await this.getById(idCarrito) //Obtengo carrito
@@ -40,70 +46,16 @@ export class DaosCarritoMongo extends Contenedor_Mongo{
                         return 1
                     }
                 }
+                console.log("producto no encontrado")
                 return 2 //producto no encontrado
-            }else return 0 //carrito no encontrado
+            }else{
+                console.log("carrito no encontrado")
+                return 0 //carrito no encontrado
+            }
         }catch(e) {
             console.log(e);
             return -1
         }
     }
 }
-
-export class DaosCarritoFirebase extends Contenedor_Firebase{ 
-    constructor(nombre){
-        super(nombre)
-    }
-
-     async agregarAlCarrito(idCarrito,producto){
-
-    try{
-
-      //Verifico si el dato producto viene de Mongo y regularizo de ser necesario
-      if(producto._doc){
-        producto={...producto._doc}
-        producto._id=producto._id.toString()
-      }
-      //--------------------------------------------------------------------------
-      
-      let carrito=await this.getById(idCarrito)
-        if (carrito){
-          carrito.productos.push(producto)
-          this.updateById(idCarrito,carrito)
-          return 1
-      }
-      else return 0
-    }catch(e){
-      console.log(e)
-      return -1
-    }
-
-  }
-
-  async quitarDelCarrito(idCarrito,idProducto){
-
-    try{
-      let carrito=await this.getById(idCarrito)
-      if (carrito){
-        let array=[...carrito.productos]
-        //Busco entre los productos bajados el que tenga el idProducto
-        for(let i=0;i<array.length;++i){ 
-          if(array[i]._id==idProducto){
-            array.splice(i,1)
-            carrito.productos=[...array]
-            await this.updateById(idCarrito,carrito)
-            console.log("Producto id:"+idProducto+" quitado del carrito id:"+idCarrito)
-            return 1
-          }
-        }
-        return 2
-      }else return 0
-    }catch(e){
-      console.log(e)
-      return -1
-    }
-
-  }
-
-}
-
 

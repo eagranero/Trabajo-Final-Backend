@@ -1,10 +1,12 @@
 import { connect } from 'mongoose';
 import { model } from 'mongoose';
+import logger from '../../utils/logger.js';
 
 
 export const connectMG = async(nombre)=>{
     try {
-        return await connect('mongodb://localhost:27017/'+nombre, { useNewUrlParser: true });
+        return await connect("mongodb+srv://eduardo:123456a@cluster0.fbnxtxd.mongodb.net/?retryWrites=true&w=majority")
+        //return await connect('mongodb://localhost:27017/'+nombre, { useNewUrlParser: true });
       } catch (e) {
         console.log(e);
       }
@@ -22,7 +24,19 @@ export default class Contenedor_Mongo{
         try{
             return await this.collectionElement.find({});
         }catch(e){
-            console.log(e)
+            logger.error("No se pudo obtener los datos de Mongo")
+        }
+    }
+
+    async buscar(elemento){
+        try{
+            let encontrado=await this.collectionElement.findOne(elemento);
+            return encontrado
+            /*if (encontrado.length>0)return encontrado;
+            else return null*/ 
+        }catch(e){
+            logger.error("No se pudo obtener el dato buscado de Mongo")
+            return (e)
         }
     }
 
@@ -30,12 +44,12 @@ export default class Contenedor_Mongo{
     async save(elemento){
         try {
             elemento.timeStamp=new Date().toLocaleString(); //Incorporo timestamp al crear
-            const ProductoNuevo = new this.collectionElement(elemento);
-            ProductoNuevo.save()
+            const nuevo = new this.collectionElement(elemento);
+            nuevo.save()
             console.log("Elemento agregado")
-            return ProductoNuevo._id.toString() 
+            return nuevo._id.toString() 
         }catch(e) {
-            console.log(e);
+            logger.error("No se pudo guardar el dato en Mongo")
         }
     }
 
@@ -46,7 +60,7 @@ export default class Contenedor_Mongo{
             await this.collectionElement.deleteOne(argumento);
             console.log("Elemento quitado")
         }catch(e) {
-            console.log(e);
+            logger.error("No se pudo quitar el dato en Mongo")
         }
     }
 
@@ -57,10 +71,22 @@ export default class Contenedor_Mongo{
             return elemento
         }
         catch(e){
-            console.log(e)
+            logger.error("No se pudo obtener el dato de Mongo")
             return -1;  
         }
     }
+
+        //Funcion para obtener un elemento a partir de su id
+        async getByIdFunc(id,func){
+            try{
+                const elemento = await this.collectionElement.findById(id,func);
+                return elemento
+            }
+            catch(e){
+                logger.error("No se pudo obtener el dato de Mongo")
+                return e;  
+            }
+        }
     
     //Funcion para eliminar elemento indicando id
     async deleteById(id){
@@ -72,7 +98,7 @@ export default class Contenedor_Mongo{
             }
         }
         catch(e){
-            console.log(e)
+            logger.error("No se pudo eliminar el dato de Mongo")
             return -1
         }
     } 
@@ -83,28 +109,20 @@ export default class Contenedor_Mongo{
             await this.collectionElement.deleteMany();
             console.log("Se elminaron todos los documentos")
         }catch(e) {
-            console.log(e);
+            logger.error("No se pudieron eliminar los datos de Mongo");
         }
     }
 
     async updateById(idElemento,nuevaInformacion){
         try{
-            let elementoActual=await this.getById(idElemento)
-            if (elementoActual!=null){
-                if (nuevaInformacion.nombre)elementoActual.nombre=nuevaInformacion.nombre;
-                if (nuevaInformacion.descripcion)elementoActual.descripcion=nuevaInformacion.descripcion;
-                if (nuevaInformacion.codigo)elementoActual.codigo=nuevaInformacion.codigo;
-                if (nuevaInformacion.foto)elementoActual.foto=nuevaInformacion.foto;
-                if (nuevaInformacion.precio)elementoActual.precio=nuevaInformacion.precio;
-                if (nuevaInformacion.stock)elementoActual.stock=nuevaInformacion.stock;
-                await this.collectionElement.findByIdAndUpdate(idElemento,elementoActual)
-                return 1
-            }else return 0
-
+            await this.collectionElement.findByIdAndUpdate(idElemento,nuevaInformacion)
+            logger.info("Dato actualizado en mongo")
         }catch(e){
-            console.log(e);
+            logger.error("No se pudo actualizar el dato en Mongo")
             return -1
         }
     }
+
+    
 }
 
