@@ -24,8 +24,8 @@ function checkAuthentication(req, res, next) {
 routerProductos.get('/',checkAuthentication, async (req, res) => {
     let login=req.session.user
     let usuario= await usuarios.buscar({username:login})
-    let foto="/perfiles/"+usuario.foto
-    res.render('productos',{login,foto});
+    usuario.foto="/perfiles/"+usuario.foto
+    res.render('productos',usuario);
 });
 
 //Direccion para borrar todos los productos de la base de datos

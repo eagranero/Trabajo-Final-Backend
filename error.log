@@ -70,3 +70,5 @@
 {"level":"error","message":"El archivo chat.txt no existe o se encuentra vacio"}
 {"level":"error","message":"El archivo chat.txt no existe o se encuentra vacio"}
 {"level":"error","message":"No se pudo actualizar el dato en Mongo"}
+{"level":"error","message":"El archivo chat.txt no existe o se encuentra vacio"}
+{"level":"error","message":"El archivo chat.txt no existe o se encuentra vacio"}

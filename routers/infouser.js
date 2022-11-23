@@ -1,7 +1,7 @@
 import express from "express";
 import { usuarios } from "./login.js";
 
-export const routerInicio = express.Router()
+export const routerInfoUser = express.Router()
 
 
 function checkAuthentication(req, res, next) {
@@ -14,9 +14,9 @@ function checkAuthentication(req, res, next) {
   
 
 //Direccion para cargar la pagina principal
-routerInicio.get('/',checkAuthentication, async (req, res) => {
+routerInfoUser.get('/',checkAuthentication, async (req, res) => {
     let login=req.session.user;
     let usuario= await usuarios.buscar({username:login})
     usuario.foto="/perfiles/"+usuario.foto
-    res.render('body',usuario);
+    res.render('infoUser',usuario);
 });

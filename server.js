@@ -20,6 +20,7 @@ import { routerCarrito } from "./routers/carrito.js";
 import enviarMail, { nuevaCompraMail, nuevoUsuarioMail } from "./utils/mail.js";
 import { smsCompraExitosa } from "./utils/sms.js";
 import { wspCompraExitosa } from "./utils/wsp.js";
+import { routerInfoUser } from "./routers/infouser.js";
 
 
 
@@ -124,7 +125,9 @@ app.use('/api/inicio',routerInicio)
 app.use('/api/productos',routerProductos);
 app.use('/api/carrito',routerCarrito)
 app.use('/api/randoms',randoms);
+app.use('/api/infouser',routerInfoUser);
 app.use('/login',routerLogin);
+
 
 app.get('/', async (req, res) => {
   if (req.session.user) res.redirect("/login")

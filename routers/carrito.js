@@ -25,12 +25,12 @@ function checkAuthentication(req, res, next) {
 //Direccion para cargar la pagina principal
 routerCarrito.get('/',checkAuthentication, async (req, res) => {
     let login=req.session.user
-    let user=await usuarios.buscar({username:login})
-    let carrito= await carritos.getById(user.carritoId)
-    let items=carrito.productos
     let usuario= await usuarios.buscar({username:login})
-    let foto="/perfiles/"+usuario.foto
-    res.render('carrito',{login,items,foto});
+    usuario.foto="/perfiles/"+usuario.foto
+    let carrito= await carritos.getById(usuario.carritoId)
+    let items=carrito.productos
+    usuario.items=items
+    res.render('carrito',usuario);
 });
 
 //Direccion para borrar todos los productos de la base de datos
