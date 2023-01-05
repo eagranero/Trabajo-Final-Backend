@@ -1,0 +1,18 @@
+<div style="display:flex; flex-direction:column" >
+    {{> encabezado}}
+    {{> encabezado_login}}
+    {{> nav}}
+
+    <div>
+        
+        {{#if this.chats}}
+            <h2>Mensajes de {{this.emisor}}</h2>
+            {{#each chats}}
+                <p><span style='color:blue;font-weight:bold'> {{this.email}} </span><span style='color:brown'>[{{this.timeStamp}}] </span> <span style='font-style:italic'>{{this.mensaje}}</span></p>
+            {{/each}}   
+        {{else}}
+            <h2>No se encuentran mensajes del usuario {{this.emisor}}</h2>
+        {{/if}}
+
+    </div> 
+</div>   

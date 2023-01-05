@@ -1,0 +1,31 @@
+<div style="display:flex; flex-direction:row; justify-content:space-around ; flex-wrap:wrap">
+     
+    <table>
+        <thead>
+            <tr>
+                <th> </th>
+                <th>Producto</th>
+                <th>Categoria</th>
+                <th>Descripcion</th>
+                <th>Precio</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        {{#each productos}}      
+        <tr>
+            <td class="centrado"><img style="width: 120px;" src="/../{{this.thumbnail}}"></td>
+            <td>{{this.nombre}}</td>
+            <td>{{this.categoria}}</td>
+            <td>{{this.descripcion}}</td>
+            <td class="centrado">${{this.precio}}</td>
+            <td class="centrado"><form method="post" action="/api/carrito/agregaritem/{{this._id}}"><button style="margin-block: 10px;" name="boton" type="submit" placeholder="Agregar al Carrito">Agregar al Carrito</button></form></td>
+        </tr>   
+        {{/each}}
+
+        
+        </tbody>
+    </table>
+
+</div>

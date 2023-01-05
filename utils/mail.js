@@ -1,14 +1,14 @@
 import { createTransport } from 'nodemailer';
 import logger from './logger.js';
 
-const MAIL_ADMIN = 'augustine.bogisich@ethereal.email'
+const MAIL_ADMIN = 'blanca83@ethereal.email'
 
 const transporter = createTransport({
    host: 'smtp.ethereal.email',
    port: 587,
    auth: {
        user: MAIL_ADMIN,
-       pass: 'erhC4E41whMR7f8nJS'
+       pass: 'bBC31S49enqX1R2NUG'
    }
 });
 
@@ -27,7 +27,6 @@ export default async function enviarMail(from,to,subject,html){
     try {
         const info = await transporter.sendMail(mailOptions)
         logger.info("Mail Enviado")
-        //console.log(info)
     } catch (err) {
         logger.error("No se pudo enviar el mail")
         console.log(err)
@@ -61,7 +60,7 @@ export const nuevaCompraMail = (usuario,productos)=>{
         html:""
     }
 
-    mailOptions.subject="Nuevo pedido de "+usuario.nombre
+    mailOptions.subject="Nuevo pedido de "+ usuario.username
 
     mailOptions.html=
     '<div>'
@@ -79,6 +78,7 @@ export const nuevaCompraMail = (usuario,productos)=>{
     for(let i=0;i<productos.length;++i){
         mailOptions.html+='<p>Nombre:'+productos[i].nombre+'</p>'
         mailOptions.html+='<p>Precio:'+productos[i].precio+'</p>'
+        mailOptions.html+='<p>Cantidad:'+productos[i].cantidad+'</p>'
     }
     mailOptions.html+='</div>';
     enviarMail(mailOptions.from,mailOptions.to,mailOptions.subject,mailOptions.html);

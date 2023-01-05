@@ -1,42 +1,30 @@
-import express, { json } from "express";
-import Contenedor_FS from "../daos/fs/Contenedor_FS.js";
-import { SchemaProducto } from "../daos/mongo/models/Schemas.js";
-import { DaosProductoMongo } from "../daos/daosProducto.js";
-import { usuarios } from "./login.js";
+import express from "express";
+import { agregarProductoController, borrarProductosController, initPorductosController, productoIdController, productosCategoriaController } from "../controllers/productos_controller.js";
+import { checkAdmin, checkAuthentication } from "../utils/auth.js";
+import { upload } from "../utils/upload.js";
 
-
-export const listadoProductos =  new DaosProductoMongo("productos",SchemaProducto)
-export const listadoChat= new Contenedor_FS("chat")
 export const routerProductos = express.Router()
 
-
-
-function checkAuthentication(req, res, next) {
-    if (req.isAuthenticated()) {
-      next();
-    } else {
-      res.redirect("/login");
-    }
-  }
-  
-
 //Direccion para cargar la pagina principal
-routerProductos.get('/',checkAuthentication, async (req, res) => {
-    let login=req.session.user
-    let usuario= await usuarios.buscar({username:login})
-    usuario.foto="/perfiles/"+usuario.foto
-    res.render('productos',usuario);
-});
+routerProductos.get('/',checkAuthentication, initPorductosController);
 
 //Direccion para borrar todos los productos de la base de datos
-routerProductos.get('/borrarproductos',checkAuthentication, async (req, res) => {
-    await listadoProductos.deleteAll()
-    res.redirect("/api/productos")
-});
+routerProductos.get('/borrarproductos',checkAuthentication,checkAdmin, borrarProductosController);
 
-//Direccion para borrar todos los productos de la base de datos
-routerProductos.get('/borrarChat',checkAuthentication, async (req, res) => {
-    await listadoChat.deleteAll()
-    res.redirect("/api/productos")
-});
+
+//Direccion para ingresar al formulario de ingreso de nuevo producto
+routerProductos.get('/nuevoproducto',checkAuthentication,checkAdmin, async (req, res) => {
+    res.render('agregar_producto');
+})
+
+//Direccion para subir producto nuevo
+routerProductos.post('/nuevoproducto',checkAuthentication,checkAdmin, upload.single('thumbnail'), agregarProductoController);
+
+//Direccion para mostrar productos por categoria
+routerProductos.get('/categorias/:categoria',checkAuthentication, productosCategoriaController);
+
+//Direccion para mostrar productos por categoria
+routerProductos.get('/:id',checkAuthentication, productoIdController);
+
+
 

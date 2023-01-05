@@ -4,13 +4,12 @@
     {{> nav}}
     <div>
         <div style="padding:20px ;margin:10px ;text-align:center"> 
-            <img style="width:100px" src={{{this.foto}}}>
-            <h2>Username: {{{this.username}}}</h2>
-            <h2>Nombre: {{{this.nombre}}}</h2>
-            <h2>Direccion: {{{this.direccion}}}</h2>
-            <h2>Edad: {{{this.edad}}}</h2>
-            <h2>Telefono: {{{this.telefono}}}</h3>
+            <img style="width:100px" src={{{this.usuario.foto}}}>
+            <h2>Username: {{{this.usuario.username}}}</h2>
+            <h2>Nombre: {{{this.usuario.nombre}}}</h2>
+            <h2>Direccion: {{{this.usuario.direccion}}}</h2>
+            <h2>Edad: {{{this.usuario.edad}}}</h2>
+            <h2>Telefono: {{{this.usuario.telefono}}}</h3>
         </div>
-        {{> chat}}
     </div>
 </div>

@@ -1,0 +1,13 @@
+<div style="display:flex; flex-direction:column" >
+    {{> encabezado}}
+    {{> encabezado_login}}
+    {{> nav}}
+    <div>
+            <h1  style="margin-block:10px; font-size: 20px; text-align:center">LISTADO DE PRODUCTOS</h1>
+            {{#if productos}}
+                {{> item_productos}}
+            {{else}}
+                <h2 style="text-align: center;">Producto/s no encontrado/s</h2>
+            {{/if}}
+    </div>
+</div>

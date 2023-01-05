@@ -2,12 +2,20 @@
     {{> encabezado}}
     {{> encabezado_login}}
     {{> nav}}
-    <div>
+    <div >
+        {{#if items}} 
         {{> item}}
-        <form style="display:flex; justify-content:center" method="post" action="carrito/comprar">
-            <button style="width:50%; font-size:2rem  ;margin-block: 10px;" name="boton" type="submit" placeholder="Comprar">Comprar</button>
-        </form>
-        <h1 id="h1-compresion" style="text-align:center"></h1>
-        {{> chat}}
+        <div style="display: flex; justify-content:center ">
+            <form style="width:50%; text-align:center" method="post" action="carrito/borrarcarrito">
+                <button style="width:50%; font-size:2rem  ;margin-block: 10px;" name="boton" type="submit" placeholder="Borrar Carrito">Borrar Carrito</button>
+            </form>
+            <form style="width:50%; text-align:center"   method="post" action="carrito/comprar">
+                <button style="width:50%; font-size:2rem  ;margin-block: 10px;" name="boton" type="submit" placeholder="Comprar">Comprar</button>
+            </form>
+        </div>
+
+        {{else}} 
+        <h2 style="text-align: center;">Carrito Vacio</h2>
+        {{/if}}
     </div>
 </div>

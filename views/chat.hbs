@@ -1,0 +1,17 @@
+<div style="display:flex; flex-direction:column" >
+    {{> encabezado}}
+    {{> encabezado_login}}
+    {{> nav}}
+
+    <div>
+        <h1 id="h1-compresion" style="text-align:center"></h1>
+        <div style="padding-block: 30px; display:flex; flex-direction:column; align-items: center " >
+            <h1  style="margin-block:10px; font-size: 20px; text-align:center">SALA DE CHAT</h1>
+            <form style="display:flex; flex-direction:column" onsubmit="return enviar()">
+                <input id="caja-msg" type="text" placeholder="Mensaje"/>
+                <input type="submit" value="Enviar"/>
+            </form>
+            <div style="width:50%; text-align:center" id="div-chats"></div>
+        </div>
+    </div>
+</div>  

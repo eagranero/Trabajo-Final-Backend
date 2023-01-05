@@ -1,5 +1,5 @@
 import express from "express";
-import { usuarios } from "./login.js";
+import { usuarios } from "../persistencia/usuarios_persistencia.js";
 
 export const routerInfoUser = express.Router()
 
@@ -18,5 +18,5 @@ routerInfoUser.get('/',checkAuthentication, async (req, res) => {
     let login=req.session.user;
     let usuario= await usuarios.buscar({username:login})
     usuario.foto="/perfiles/"+usuario.foto
-    res.render('infoUser',usuario);
+    res.render('infoUser',{usuario});
 });

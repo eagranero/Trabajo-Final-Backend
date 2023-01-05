@@ -1,0 +1,18 @@
+<div style="display:flex; flex-direction:column" >
+    {{> encabezado}}
+    {{> encabezado_login}}
+    {{> nav}}
+    <div>
+        <div style="padding-block: 30px; display:flex; flex-direction: column; align-items: center;border-color:red; border-bottom:solid">
+            <h1 style="margin-block:10px; font-size: 20px; ">NUEVO PRODUCTO</h1>
+            <form style="display:flex; flex-direction: column;width: 200px;" method="post" action="/api/productos/nuevoproducto" enctype="multipart/form-data">
+                <input style="margin-block: 5px;"  type="text" id="nombre" name="nombre" value=""  placeholder="nombre"/>
+                <input style="margin-block: 5px;" type="number" id="precio" name="precio" value="" placeholder="precio"/>
+                <input style="margin-block: 5px;" type="text" id="categoria" name="categoria" value="" placeholder="categoria"/>
+                <input style="margin-block: 5px;" type="text" id="descripcion" name="descripcion" value="" placeholder="descripcion"/>
+                <input style="margin-block: 5px;" type="file" id="thumbnail" name="thumbnail" value="" placeholder="Foto"/>
+                <button style="margin-block: 10px;" name="boton" type="submit" placeholder="Sign Up">Agregar Producto</button>
+            </form>
+        </div>
+    </div>
+</div>

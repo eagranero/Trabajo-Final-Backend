@@ -6,14 +6,15 @@
             <form style="display:flex; flex-direction: column;width: 200px;" method="post" action="/login/signup" enctype="multipart/form-data">
                 <input style="margin-block: 5px;"  type="text" id="username" name="username" value=""  placeholder="Username"/>
                 <input style="margin-block: 5px;" type="text" id="password" name="password" value="" placeholder="Password"/>
+                <input style="margin-block: 5px;" type="text" id="password2" name="password2" value="" placeholder="Reingrese Password"/>
                 <input style="margin-block: 5px;" type="text" id="nombre" name="nombre" value="" placeholder="Nombre"/>
                 <input style="margin-block: 5px;" type="text" id="direccion" name="direccion" value="" placeholder="Direccion"/>
                 <input style="margin-block: 5px;" type="number" id="edad" name="edad" value="" placeholder="edad"/>
                 <input style="margin-block: 5px;" type="number" id="telefono" name="telefono" value="" placeholder="Telefono"/>
-                <input style="margin-block: 5px;" type="file" id="foto" name="foto" value="" placeholder="Foto"/>
+                <input style="margin-block: 5px;" type="file" id="perfiles" name="perfiles" value="" placeholder="Foto"/>
                 <button style="margin-block: 10px;" name="boton" type="submit" placeholder="Sign Up">Sign Up</button>
             </form>
-            <form action="/login"><button style="margin-block: 10px;" name="boton" type="submit" placeholder="Ir a Login">Login</button></form>
+            <form style="display:flex; flex-direction: column;width: 200px;" action="/login"><button style="margin-block: 10px;" name="boton" type="submit" placeholder="Ir a Login">Login</button></form>
         </div>
     </div>
 </div>

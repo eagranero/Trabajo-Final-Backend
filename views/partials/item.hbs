@@ -1,10 +1,33 @@
-<div style="display:flex; flex-direction:row; justify-content:space-around ; flex-wrap:wrap"> 
-{{#each items}}
-    <div style="border-style:solid; padding:20px ;margin:10px ;text-align:center; width:200px"> 
-        <h2>{{{this.nombre}}}</h2>
-        <h3>{{{this.precio}}}</h3>
-        <img src={{{this.thumbnail}}}>
-        <form method="post" action="carrito/quitaritem/{{{this._id}}}"><button style="margin-block: 10px;" name="boton" type="submit" placeholder="Quitar del Carrito">Quitar del Carrito</button></form>
-    </div>
-{{/each}}
+<div style="display:flex; flex-direction:row; justify-content:space-around ; flex-wrap:wrap">
+     
+    <table>
+        <thead>
+            <tr>
+                <th> </th>
+                <th>Producto</th>
+                <th>Categoria</th>
+                <th>Descripcion</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        {{#each items}}      
+        <tr>
+            <td class="centrado"><img  src={{{this.thumbnail}}}></td>
+            <td>{{{this.nombre}}}</td>
+            <td>{{{this.categoria}}}</td>
+            <td>{{{this.descripcion}}}</td>
+            <td class="centrado">{{{this.cantidad}}}</td>
+            <td class="centrado">${{{this.precio}}}</td>
+            <td class="centrado"><form method="post" action="carrito/quitaritem/{{{this._id}}}"><button style="margin-block: 10px;" name="boton" type="submit" placeholder="Quitar del Carrito">Quitar del Carrito</button></form></td>
+        </tr>   
+        {{/each}}
+
+        
+        </tbody>
+    </table>
+
 </div>

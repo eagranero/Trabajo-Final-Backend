@@ -15,11 +15,11 @@ export default class Contenedor_FS{
             contenido = fs.readFileSync(this.nombre,'utf-8') || [];
             let listadoParce = JSON.parse(contenido) || [];
             this.listado=listadoParce;
-            this.ultimoID=this.listado[this.listado.length-1].id;
+            this.ultimoID=this.listado[this.listado.length-1]._id;
             return listadoParce
         }
         catch (err){
-            logger.error("El archivo "+this.nombre+" no existe o se encuentra vacio")
+            logger.warn("El archivo "+this.nombre+" no existe o se encuentra vacio")
             return []
         }   
     }
@@ -41,7 +41,8 @@ export default class Contenedor_FS{
         try{
             this.getAll()
             this.ultimoID++;
-            elemento.id=this.ultimoID;
+            elemento._id=this.ultimoID;
+            elemento.timeStamp=new Date().toLocaleString(); //Incorporo timestamp al crear
             this.listado.push(elemento);
             fs.writeFileSync(this.nombre,JSON.stringify(this.listado))
             return this.ultimoID;            
@@ -52,16 +53,17 @@ export default class Contenedor_FS{
     }
 
     //Funcion para mostrar la informacion de un producto segun el ID. Retorna el indice del listado
-    getByID(indicador){
+    getById(indicador){
         try{
             this.getAll()
             let indice=-1;
             for(let i=0;i<this.listado.length;i++){
-            if (this.listado[i].id==indicador){
+            if (this.listado[i]._id==indicador){
                 indice = i;
             }
             }
-            return indice;
+            if(indice != -1) return this.listado[indice];
+            else return []
         }
         catch{
             logger.error("No se pudo leer el archivo "+this.nombre)
@@ -75,19 +77,19 @@ export default class Contenedor_FS{
             this.getAll()
             let indiceBorrar=-1;
             for(let i=0;i<this.listado.length;i++){
-                if (this.listado[i].id==indicador)
+                if (this.listado[i]._id==indicador)
                 {
                     indiceBorrar=i;
                 }
             }
             if(indiceBorrar==-1){
-                console.log("No se encuentra el indice");
+                logger.info("No se encuentra el indice");
                 return false; //Retorno false si no se encontro indice
             }
             else{
                 this.listado.splice(indiceBorrar,1)
                 fs.writeFileSync(this.nombre,JSON.stringify(this.listado))
-                console.log("Elemento borrado")
+                logger.info("Elemento borrado")
                 return true; //Retorno true si lo encontro y elimino correctamente
             }    
         }
@@ -102,87 +104,30 @@ export default class Contenedor_FS{
             this.listado=[];
             this.ultimoID=0;
             fs.writeFileSync(this.nombre,JSON.stringify(this.listado))
-            console.log("El contenido del archivo "+ this.nombre +" ha sido eliminado")
+            logger.info("El contenido del archivo "+ this.nombre +" ha sido eliminado")
         }
         catch{
             logger.error("No se pudo modificar el archivo "+this.nombre)
         }
     }
 
-
-
-    agregarAlCarrito(idCarrito,producto)
-    { 
-        let i=0;
+    updateById(idElemento,nuevaInformacion){
         try{
             this.getAll()
-            let idEncontrado=-1;
-            for(i=0; i<this.listado.length;++i)
-            {
-                if (this.listado[i].id==idCarrito){
-                    idEncontrado=i;
-                    break;
-                }
-            }
-            if (idEncontrado>-1){
-                this.listado[idEncontrado].productos.push(producto);
-                fs.writeFileSync(this.nombre,JSON.stringify(this.listado))
-                return true 
-            }
-            else {
-                console.log("No se encontro el carrito")
-                return false
-            }            
-        }
-        catch{
-            logger.error("No se pudo guardar el archivo "+this.nombre)
-        }
-    }
-
-
-    quitarDelCarrito(idCarrito,idProducto){
-        let i=0;
-        try{
-            this.getAll()
-            let indiceCarritoEncontrado=-1,indiceProductoEncontrado=-1;
-            //Busco  del indice del carrito
-            for(i=0; i<this.listado.length;++i)
-            {
-                //Si lo encuentro lo guardo y salgo del for
-                if (this.listado[i].id==idCarrito){
-                    indiceCarritoEncontrado=i;
-                    break;
-                }
-            }
-            //Si encuentro el indice del carrito busco el indice del producto
-            if (indiceCarritoEncontrado>-1){
-                for(i=0; i<this.listado[indiceCarritoEncontrado].productos.length;++i){
-                    //Si lo encuentro el dindice del producto lo guardo y salgo del for
-                    if (this.listado[indiceCarritoEncontrado].productos[i].id==idProducto){
-                        indiceProductoEncontrado=i;
-                        break;
-                    }
-                }
-                //Si encontre el indice del producto lo borro y guardo el archivo
-                if(indiceProductoEncontrado>-1){
-                    this.listado[indiceCarritoEncontrado].productos.splice(indiceProductoEncontrado,1)
+            for(let i=0;this.listado.length;++i){
+                if(this.listado[i]._id==idElemento){
+                    nuevaInformacion._id=idElemento
+                    this.listado[i]=nuevaInformacion
                     fs.writeFileSync(this.nombre,JSON.stringify(this.listado))
-                    return 0
+                    logger.info("Dato actualizado en el archivo")
+                    break
                 }
-                else{ //si no encuentro el producto
-                    console.log("No se encontro el producto")
-                    return 1
-                } 
             }
-            else{ //si no encuentro el carrito
-                console.log("No se encontro el carrito")
-                return 2
-            }            
+        }catch(e){
+            console.log(e)
+            logger.error("No se pudo actualizar el dato en el archivo")
+            return -1
         }
-        catch(err){
-            logger.error("No se pudo guardar el archivo "+this.nombre)
-            return 3
-        } 
     }
 
 }

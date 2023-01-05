@@ -6,9 +6,9 @@ import logger from '../../utils/logger.js';
 export const connectMG = async(nombre)=>{
     try {
         return await connect("mongodb+srv://eduardo:123456a@cluster0.fbnxtxd.mongodb.net/?retryWrites=true&w=majority")
-        //return await connect('mongodb://localhost:27017/'+nombre, { useNewUrlParser: true });
       } catch (e) {
         console.log(e);
+        logger.error("Error al intentar conectar a la base de datos de Mongo")
       }
 }
 
@@ -22,7 +22,7 @@ export default class Contenedor_Mongo{
     //Funcion para obtener todos los elementos de una coleccion
     async getAll(){
         try{
-            return await this.collectionElement.find({});
+            return await this.collectionElement.find({}).lean();
         }catch(e){
             logger.error("No se pudo obtener los datos de Mongo")
         }
@@ -30,13 +30,22 @@ export default class Contenedor_Mongo{
 
     async buscar(elemento){
         try{
-            let encontrado=await this.collectionElement.findOne(elemento);
+            let encontrado=await this.collectionElement.findOne(elemento).lean();
             return encontrado
-            /*if (encontrado.length>0)return encontrado;
-            else return null*/ 
         }catch(e){
             logger.error("No se pudo obtener el dato buscado de Mongo")
             return (e)
+        }
+    }
+
+
+    async buscarTodos(elemento){
+        try{
+            let encontrado=await this.collectionElement.find(elemento).lean();
+            return encontrado
+        }catch(e){
+            logger.error("No se pudo obtener el dato buscado de Mongo")
+            return []
         }
     }
 
@@ -45,10 +54,11 @@ export default class Contenedor_Mongo{
         try {
             elemento.timeStamp=new Date().toLocaleString(); //Incorporo timestamp al crear
             const nuevo = new this.collectionElement(elemento);
-            nuevo.save()
-            console.log("Elemento agregado")
+            await nuevo.save()
+            logger.info("Elemento agregado a la coleccion de Mongo")
             return nuevo._id.toString() 
         }catch(e) {
+            console.log(e)
             logger.error("No se pudo guardar el dato en Mongo")
         }
     }
@@ -58,7 +68,7 @@ export default class Contenedor_Mongo{
     async quitarElemento(argumento){
         try {
             await this.collectionElement.deleteOne(argumento);
-            console.log("Elemento quitado")
+            logger.info("Elemento eliminado de la coleccion de mongo")
         }catch(e) {
             logger.error("No se pudo quitar el dato en Mongo")
         }
@@ -67,7 +77,7 @@ export default class Contenedor_Mongo{
     //Funcion para obtener un elemento a partir de su id
     async getById(id){
         try{
-            const elemento = await this.collectionElement.findById(id);
+            const elemento = await this.collectionElement.findById(id).lean();
             return elemento
         }
         catch(e){
@@ -79,7 +89,7 @@ export default class Contenedor_Mongo{
         //Funcion para obtener un elemento a partir de su id
         async getByIdFunc(id,func){
             try{
-                const elemento = await this.collectionElement.findById(id,func);
+                const elemento = await this.collectionElement.findById(id,func).lean();
                 return elemento
             }
             catch(e){
@@ -93,7 +103,7 @@ export default class Contenedor_Mongo{
         try{
             if(await this.collectionElement.findByIdAndDelete(id)==null)return 0;
             else{
-                console.log("Elemento con Id:"+id+" eliminado")
+                logger.info("Elemento con Id:"+id+" eliminado de la coleccion de Mongo")
                 return 1
             }
         }
@@ -107,7 +117,7 @@ export default class Contenedor_Mongo{
     async deleteAll(){
         try {
             await this.collectionElement.deleteMany();
-            console.log("Se elminaron todos los documentos")
+            logger.info("Se elminaron todos los documentos de la coleccion de Mongo")
         }catch(e) {
             logger.error("No se pudieron eliminar los datos de Mongo");
         }

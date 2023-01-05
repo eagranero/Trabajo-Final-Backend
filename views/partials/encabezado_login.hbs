@@ -1,15 +1,18 @@
 <div style="display:flex; flex-direction: column; align-items: center;">
     
-    {{#if this.username}}
-    <h1>Bienvenido {{this.username}}</h1>
-    <img style="width:100px" src={{this.foto}}>
+    {{#if this.usuario}}
+    <h1>Bienvenido {{this.usuario.username}}</h1>
+    <img style="width:100px" src={{this.usuario.foto}}>
     <form  action="/login/logout">
-        <button>LOGOUT</button>
+        <button style="width: 150px; margin:5px;">LOGOUT</button>
+    </form>
+    <form method="get" action="/login/admin">
+        <button style="width: 150px; margin:5px;">ADMINISTRACION</button>
     </form>
     {{else}}
     <h1>No estas Logeado</h1>
     <form action="/login">
-        <button>LOGIN</button>
+        <button style="width: 150px; margin:5px;">LOGIN</button>
     </form>
     {{/if}}
 
